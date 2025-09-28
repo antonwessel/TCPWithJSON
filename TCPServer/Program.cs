@@ -30,18 +30,32 @@ async Task HandleClientAsync(TcpClient client, string remote)
             await Send(writer, new Response(false, error: "Empty request"));
             return;
         }
-        else
+
+        Request? req;
+        try
         {
-            Request? req;
-            try
-            {
-                req = JsonSerializer.Deserialize<Request>(line);
-            }
-            catch (Exception)
-            {
-                await Send(writer, new Response(false, error: "Invalid JSON");
-                return;
-            }
+            req = JsonSerializer.Deserialize<Request>(line);
+        }
+        catch (Exception)
+        {
+            await Send(writer, new Response(false, error: "Invalid JSON"));
+            return;
+        }
+
+        if (req is null)
+        {
+            await Send(writer, new Response(false, error: "Invalid request object"));
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(req.method))
+        {
+            await Send(writer, new Response(false, error: "Field 'method' is missing"));
+            return;
+        }
+        if (req.a is null || req.b is null)
+        {
+            await Send(writer, new Response(false, error: "Fields 'a' and 'b' must be valid integers"));
+            return;
         }
 
 
