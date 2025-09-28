@@ -42,6 +42,7 @@ async Task HandleClientAsync(TcpClient client, string remote)
             return;
         }
 
+        // Validates request data
         if (req is null)
         {
             await Send(writer, new Response(false, error: "Invalid request object"));
@@ -58,12 +59,42 @@ async Task HandleClientAsync(TcpClient client, string remote)
             return;
         }
 
+        var method = req.method.Trim().ToLower();
+        var a = req.a.Value; // I have to use .Value here 🤔
+        var b = req.b.Value;
+
+        // Runs method
+        switch (method)
+        {
+            case "add":
+                await Send(writer, new Response(true, result: a + b));
+                break;
+            case "subtract":
+                await Send(writer, new Response(true, result: a - b));
+                break;
+            case "random":
+                if (a > b)
+                {
+                    await Send(writer, new Response(false, error: "For 'Random', 'a' must be less than or equal to 'b'"));
+                    break;
+                }
+                var value = (a == b) ? a : Random.Shared.Next(a, b + 1); // Shorthand for if-else. 'Shared' makes it thread safe.
+                await Send(writer, new Response(true, result: value));
+                break;
+            default:
+                await Send(writer, new Response(false, error: "Unknown method, please use: 'Add', 'Subtract', or 'Random'"));
+                break;
+        }
 
     }
     catch (Exception)
     {
-
-        throw;
+        // Just ignore errors and close nicely 😎
+    }
+    finally
+    {
+        client.Close();
+        Console.WriteLine("Client disconnected!");
     }
 }
 
