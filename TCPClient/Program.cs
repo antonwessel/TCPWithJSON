@@ -10,11 +10,24 @@ await using var stream = client.GetStream();
 using var reader = new StreamReader(stream);
 using var writer = new StreamWriter(stream);
 
+var method = ReadMethod();
 
+static string ReadMethod()
+{
+    // Only these methods are valid. Casing doesn't matter.
+    var valid = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Add", "Subtract", "Random" };
 
+    while (true)
+    {
+        Console.WriteLine("Method? (Add / Subtract / Random): ");
+        var input = Console.ReadLine() ?? "".Trim(); // Null-coalescing operator ☺️
 
+        if (valid.Contains(input))
+            return input;
 
-
+        Console.WriteLine("Invalid method, please try again. Use 'Add', 'Subtract', or 'Random'.");
+    }
+}
 
 public record Request(string? method, int? a, int? b);
 public record Response(bool ok, int? result = null, string? error = null);
