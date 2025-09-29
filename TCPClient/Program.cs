@@ -11,6 +11,19 @@ using var reader = new StreamReader(stream);
 using var writer = new StreamWriter(stream);
 
 var method = ReadMethod();
+var (a, b) = ReadNumbers(method);
+
+static (int a, int b) ReadNumbers(string method)
+{
+    while (true)
+    {
+        Console.Write("Write two integers (a b): ");
+        var parts = (Console.ReadLine() ?? "").Split(" ", StringSplitOptions.RemoveEmptyEntries); // Return an array containg the two numbers
+
+
+
+    }
+}
 
 static string ReadMethod()
 {
@@ -28,6 +41,8 @@ static string ReadMethod()
         Console.WriteLine("Invalid method, please try again. Use 'Add', 'Subtract', or 'Random'.");
     }
 }
+
+
 
 public record Request(string? method, int? a, int? b);
 public record Response(bool ok, int? result = null, string? error = null);
