@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Reflection;
 
 const string Host = "127.0.0.1"; // Localhost (IP address)
 const int Port = 5001; // Same as server
@@ -20,8 +21,17 @@ static (int a, int b) ReadNumbers(string method)
         Console.Write("Write two integers (a b): ");
         var parts = (Console.ReadLine() ?? "").Split(" ", StringSplitOptions.RemoveEmptyEntries); // Return an array containg the two numbers
 
-
-
+        // Check to see if there's only 2 numbers and if they are both of type integer
+        if (parts.Length == 2 && int.TryParse(parts[0], out var a) && int.TryParse(parts[1], out var b))
+        {
+            if (method.Equals("Random", StringComparison.CurrentCultureIgnoreCase) && a > b)
+            {
+                Console.WriteLine("Wrong inputs, for 'Random', 'b' has to be greater than or equal to 'a'");
+                continue;
+            }
+            return (a, b);
+        }
+        Console.WriteLine("Invalid input. Example: 5 12");
     }
 }
 
