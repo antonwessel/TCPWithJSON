@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Reflection;
+using System.Text.Json;
 
 const string Host = "127.0.0.1"; // Localhost (IP address)
 const int Port = 5001; // Same as server
@@ -11,8 +12,40 @@ await using var stream = client.GetStream();
 using var reader = new StreamReader(stream);
 using var writer = new StreamWriter(stream);
 
+// Validate and check that the method and the numbers are correct
 var method = ReadMethod();
 var (a, b) = ReadNumbers(method);
+
+// Use the method and numbers to create a new request and turn it into JSON
+var request = new Request(method, a, b);
+var json = JsonSerializer.Serialize(request);
+
+await writer.WriteAsync(json); // Write data to server
+var reply = await reader.ReadLineAsync(); // Get data from server
+if (string.IsNullOrEmpty(reply))
+{
+    Console.WriteLine("No reply from server.");
+    return;
+}
+
+Response? res;
+try
+{
+    res = JsonSerializer.Deserialize<Response>(reply);
+}
+catch (Exception)
+{
+    Console.WriteLine("Couldn't read JSON data.");
+    return;
+}
+
+if (res is null)
+{
+    Console.WriteLine("Invalid answer.");
+    return;
+}
+
+Console.WriteLine(res.ok ? $"Result: {res.result}" : $"Error: {res.error}");
 
 static (int a, int b) ReadNumbers(string method)
 {
