@@ -20,7 +20,7 @@ async Task HandleClientAsync(TcpClient client, string remote)
 {
     await using var stream = client.GetStream(); // Data back and forth
     using var reader = new StreamReader(stream); // Reads from stream
-    using var writer = new StreamWriter(stream); // Writes to the stream
+    using var writer = new StreamWriter(stream) { AutoFlush = true }; // Writes to the stream
 
     try
     {

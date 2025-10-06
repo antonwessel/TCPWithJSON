@@ -10,7 +10,7 @@ await client.ConnectAsync(Host, Port); // Connect to server
 
 await using var stream = client.GetStream();
 using var reader = new StreamReader(stream);
-using var writer = new StreamWriter(stream);
+using var writer = new StreamWriter(stream) { AutoFlush = true };
 
 // Validate and check that the method and the numbers are correct
 var method = ReadMethod();
@@ -20,7 +20,7 @@ var (a, b) = ReadNumbers(method);
 var request = new Request(method, a, b);
 var json = JsonSerializer.Serialize(request);
 
-await writer.WriteAsync(json); // Write data to server
+await writer.WriteLineAsync(json); // Write data to server
 var reply = await reader.ReadLineAsync(); // Get data from server
 if (string.IsNullOrEmpty(reply))
 {
